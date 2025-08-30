@@ -1,6 +1,6 @@
 {
   "name": "@peoplesgrocers/seti-icons",
-  "version": "0.0.5",
+  "version": "1.11.0",
   "description": "File icons from Seti-UI",
   "main": "lib/index.js",
   "scripts": {
