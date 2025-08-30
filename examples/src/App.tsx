@@ -56,72 +56,26 @@ const lightColorTheme = {
 
 const darkColorTheme = {
   blue: '#268bd2',
-  grey: '#657b83',
+  // grey: '#657b83',
+  grey: "#eee",
   'grey-light': '#839496',
-  green: '#859900',
+  green: '#4bae4f',
   orange: '#cb4b16',
   pink: '#d33682',
   purple: '#6c71c4',
   red: '#dc322f',
   white: '#fdf6e3',
-  yellow: '#b58900',
+  yellow: '#ffcb29',
   ignore: '#586e75',
 }
 
 interface ThemedIcon {
   svg: string
   color: string
+  byteSize: number
 }
 
-function IconDisplay({
-  filename,
-  original,
-  updated
-}: {
-  filename: string
-  original: ThemedIcon | null
-  updated: ThemedIcon | null
-}) {
-  const isDifferent = original?.svg !== updated?.svg || original?.color !== updated?.color
 
-  return (
-    <div className={`icon-item ${isDifferent ? 'different' : 'same'}`}>
-      <h4 className="filename">{filename}</h4>
-      <div className="icon-comparison">
-        <div className="icon-version">
-          <h5>Original (seti-icons)</h5>
-          {original?.svg ? (
-            <div className="icon-container">
-              <div
-                className="icon-svg"
-                dangerouslySetInnerHTML={{ __html: original.svg }}
-                style={{ color: original.color }}
-              />
-              <span className="color-name">{original.color}</span>
-            </div>
-          ) : (
-            <div className="no-icon">No icon</div>
-          )}
-        </div>
-        <div className="icon-version">
-          <h5>Updated (@peoplesgrocers/seti-icons)</h5>
-          {updated?.svg ? (
-            <div className="icon-container">
-              <div
-                className="icon-svg"
-                dangerouslySetInnerHTML={{ __html: updated.svg }}
-                style={{ color: updated.color }}
-              />
-              <span className="color-name">{updated.color}</span>
-            </div>
-          ) : (
-            <div className="no-icon">No icon</div>
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
 
 function App() {
   const [filter, setFilter] = useState<'all' | 'different'>('all')
@@ -141,13 +95,25 @@ function App() {
       let updated: ThemedIcon | null = null
 
       try {
-        original = getThemedOriginal(filename)
+        const originalIcon = getThemedOriginal(filename)
+        if (originalIcon) {
+          original = {
+            ...originalIcon,
+            byteSize: new TextEncoder().encode(originalIcon.svg).length
+          }
+        }
       } catch {
         // Keep original as null
       }
 
       try {
-        updated = getThemedUpdated(filename)
+        const updatedIcon = getThemedUpdated(filename)
+        if (updatedIcon) {
+          updated = {
+            ...updatedIcon,
+            byteSize: new TextEncoder().encode(updatedIcon.svg).length
+          }
+        }
       } catch {
         // Keep updated as null
       }
@@ -163,10 +129,10 @@ function App() {
     const seenIcons = new Map<string, { filename: string, original: ThemedIcon | null, updated: ThemedIcon | null }>()
     
     allComparisons.forEach(comparison => {
-      const { filename, original, updated } = comparison
+      const { original, updated } = comparison
       // Create a unique key for this icon combination
       const iconKey = `${original?.svg || 'null'}-${original?.color || 'null'}-${updated?.svg || 'null'}-${updated?.color || 'null'}`
-      
+
       // Only keep the first filename for each unique icon combination
       if (!seenIcons.has(iconKey)) {
         seenIcons.set(iconKey, comparison)
@@ -218,8 +184,30 @@ function App() {
             </div>
           </div>
         </div>
+      </header>
+
+      {/* Icon Showcase Section */}
+      <section className="">
+        <h2 className="icon-showcase">All Icons Showcase</h2>
+        <div className="showcase-grid">
+          {iconComparisons.map(({ filename, updated }) => {
+            if (!updated?.svg) return null
+            return (
+              <div key={filename} className="showcase-icon" title={filename}>
+                <div
+                  className="showcase-svg"
+                  dangerouslySetInnerHTML={{ __html: updated.svg }}
+                  style={{ color: updated.color }}
+                />
+              </div>
+            )
+          })}
+        </div>
+      </section>
+
+      {/* Comparison Tool Section */}
+      <section className="comparison-section">
         <p>Comparing original seti-icons package vs updated @peoplesgrocers/seti-icons</p>
-        
         <div className="controls">
           <div className="left-controls">
             <div className="filter-controls">
@@ -252,7 +240,7 @@ function App() {
             <span className="stat same">Same: {sameCount}</span>
           </div>
         </div>
-      </header>
+      </section>
       
       <div className="icons-grid-compact">
         <div className="grid-header">
@@ -268,12 +256,13 @@ function App() {
               <div className="icon-cell">
                 {original?.svg ? (
                   <div className="icon-display">
-                    <div 
+                    <div
                       className="icon-svg-compact"
                       dangerouslySetInnerHTML={{ __html: original.svg }}
                       style={{ color: original.color }}
                     />
                     <span className="color-compact">{original.color}</span>
+                    <span className="byte-size-compact">{original.byteSize} bytes</span>
                   </div>
                 ) : (
                   <div className="no-icon-compact">—</div>
@@ -282,12 +271,13 @@ function App() {
               <div className="icon-cell">
                 {updated?.svg ? (
                   <div className="icon-display">
-                    <div 
+                    <div
                       className="icon-svg-compact"
                       dangerouslySetInnerHTML={{ __html: updated.svg }}
                       style={{ color: updated.color }}
                     />
                     <span className="color-compact">{updated.color}</span>
+                    <span className="byte-size-compact">{updated.byteSize} bytes</span>
                   </div>
                 ) : (
                   <div className="no-icon-compact">—</div>

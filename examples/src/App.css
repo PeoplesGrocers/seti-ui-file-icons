@@ -115,6 +115,56 @@ header p {
   margin-bottom: 1.5rem;
 }
 
+h2.icon-showcase {
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  text-align: center;
+}
+
+.showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(20px, 1fr));
+  gap: 4px;
+  justify-items: center;
+  align-items: center;
+  background-color: var(--bg-primary);
+  padding: 1rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--border-color);
+}
+
+.showcase-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease-in-out;
+}
+
+.showcase-icon:hover {
+  transform: scale(1.5);
+  z-index: 10;
+  position: relative;
+}
+
+.showcase-svg {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.showcase-svg svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
 .controls {
   display: flex;
   justify-content: space-between;
@@ -299,6 +349,17 @@ header p {
   border-radius: 0.25rem;
 }
 
+.byte-size-compact {
+  font-size: 0.625rem;
+  color: var(--text-secondary);
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  padding: 0.125rem 0.25rem;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 0.25rem;
+  font-weight: 500;
+}
+
 .no-icon-compact {
   color: var(--text-muted);
   font-size: 1.5rem;
@@ -355,5 +416,29 @@ header p {
   
   .tab-icon {
     font-size: 0.875rem;
+  }
+  
+  .icon-showcase {
+    padding: 1rem;
+  }
+  
+  .icon-showcase h2 {
+    font-size: 1.125rem;
+  }
+  
+  .showcase-grid {
+    grid-template-columns: repeat(auto-fill, minmax(18px, 1fr));
+    gap: 3px;
+    padding: 0.75rem;
+  }
+  
+  .showcase-icon, .showcase-svg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .showcase-svg svg {
+    width: 18px;
+    height: 18px;
   }
 }

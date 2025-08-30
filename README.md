@@ -76,6 +76,10 @@ Checks code for style issues and syntax errors with TSLint and Prettier.
 
 Checks code for style issues and syntax errors with TSLint and Prettier, attempting to fix them when possible.
 
+## SVGO Version Note
+
+This project currently uses SVGO version 1.6, while the latest version is 4.0.0 (as of Aug 2025). An attempt was made to upgrade to the newer version, but after spending approximately 1 hour trying to configure SVGO 4.0.0 to produce the same SVG paths as the original 1.6 version, visual differences remained that could not be adequately resolved. To maintain the integrity and consistency of the existing icons, the decision was made to continue using the original SVGO 1.6 configuration.
+
 ## Publishing a new version
 
 Manually
