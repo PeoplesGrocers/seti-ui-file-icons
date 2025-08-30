@@ -4,11 +4,13 @@
     "lib": [
       "ES6"
     ],
-    "module": "commonjs",
+    "module": "esnext",
+    "moduleResolution": "node",
     "declaration": true,
     "outDir": "./lib",
-    "strict": true,
     "resolveJsonModule": true,
+    "strict": true,
+    "strictNullChecks": true
   },
   "include": [
     "src"

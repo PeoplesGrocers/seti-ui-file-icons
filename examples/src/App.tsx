@@ -1,22 +1,60 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { themeIcons as themeOriginalIcons } from 'seti-icons'
-import { themeIcons as themeUpdatedIcons } from '@peoplesgrocers/seti-icons'
+import { themeIcons as themeUpdatedIcons, definitions } from '@peoplesgrocers/seti-icons'
 import './App.css'
 
-// Sample file names to demonstrate all icon types
-const sampleFiles = [
-  // Extensions
-  '.js', '.ts', '.tsx', '.jsx', '.py', '.java', '.go', '.rs', '.php', '.rb', '.c', '.cpp', '.h', '.css', '.scss', '.html', '.xml', '.json', '.yaml', '.yml', '.md', '.sql', '.sh', '.bat', '.swift', '.kt', '.dart', '.lua', '.pl', '.r', '.scala', '.clj', '.elm', '.ex', '.hs', '.jl', '.nim', '.ml', '.fs', '.ps1', '.vue', '.svelte', '.less', '.styl', '.sass', '.coffee', '.pug', '.haml', '.twig', '.mustache', '.handlebars',
-  
-  // Specific files
-  'README.md', 'package.json', 'Dockerfile', 'Makefile', 'tsconfig.json', 'webpack.config.js', 'vite.config.ts', 'babel.config.js', 'eslint.config.js', 'prettier.config.js', 'rollup.config.js', 'gulpfile.js', 'Gruntfile.js', '.gitignore', '.env', 'LICENSE', 'yarn.lock', 'pom.xml', 'build.gradle', '.travis.yml', '.github', 'Jenkinsfile', 'firebase.json', 'angular.json', 'ionic.config.json', 'platformio.ini',
-  
-  // Partials and special cases
-  'TODO', 'Procfile', 'CMakeLists.txt', 'CONTRIBUTING.md', 'COPYING', 'docker-compose.yml', 'Gemfile',
-]
+// Generate example filenames from definitions at runtime
+const generateExampleFiles = () => {
+  const examples = new Set<string>()
 
-// Color theme for consistent display
-const colorTheme = {
+  // Add extension examples
+  Object.keys(definitions.extensions).forEach(ext => {
+    examples.add(`example${ext}`)
+  })
+
+  // Add specific file examples
+  Object.keys(definitions.files).forEach(file => {
+    examples.add(file)
+  })
+
+  // Add partial examples
+  definitions.partials.forEach(([partial]: [string, unknown]) => {
+    // For partials that already have extensions, use as-is
+    if (partial.includes('.')) {
+      examples.add(partial)
+    } else {
+      // For partials without extensions, add a common extension
+      examples.add(`${partial}.txt`)
+    }
+  })
+
+  // Add some common extension examples that might not be in definitions
+  const commonExtensions = ['.js', '.ts', '.tsx', '.jsx', '.py', '.java', '.go', '.rs', '.php', '.rb']
+  commonExtensions.forEach(ext => {
+    examples.add(`example${ext}`)
+  })
+
+  return Array.from(examples).sort()
+}
+
+const allSampleFiles = generateExampleFiles()
+
+// Color themes for light and dark modes
+const lightColorTheme = {
+  blue: '#268bd2',
+  grey: '#6b7280',
+  'grey-light': '#9ca3af',
+  green: '#059669',
+  orange: '#d97706',
+  pink: '#db2777',
+  purple: '#7c3aed',
+  red: '#dc2626',
+  white: '#374151',
+  yellow: '#eab308',
+  ignore: '#9ca3af',
+}
+
+const darkColorTheme = {
   blue: '#268bd2',
   grey: '#657b83',
   'grey-light': '#839496',
@@ -30,10 +68,20 @@ const colorTheme = {
   ignore: '#586e75',
 }
 
-const getThemedOriginal = themeOriginalIcons(colorTheme)
-const getThemedUpdated = themeUpdatedIcons(colorTheme)
+interface ThemedIcon {
+  svg: string
+  color: string
+}
 
-function IconDisplay({ filename, original, updated }: { filename: string, original: any, updated: any }) {
+function IconDisplay({
+  filename,
+  original,
+  updated
+}: {
+  filename: string
+  original: ThemedIcon | null
+  updated: ThemedIcon | null
+}) {
   const isDifferent = original?.svg !== updated?.svg || original?.color !== updated?.color
 
   return (
@@ -44,9 +92,9 @@ function IconDisplay({ filename, original, updated }: { filename: string, origin
           <h5>Original (seti-icons)</h5>
           {original?.svg ? (
             <div className="icon-container">
-              <div 
+              <div
                 className="icon-svg"
-                dangerouslySetInnerHTML={{ __html: original.svg }} 
+                dangerouslySetInnerHTML={{ __html: original.svg }}
                 style={{ color: original.color }}
               />
               <span className="color-name">{original.color}</span>
@@ -59,7 +107,7 @@ function IconDisplay({ filename, original, updated }: { filename: string, origin
           <h5>Updated (@peoplesgrocers/seti-icons)</h5>
           {updated?.svg ? (
             <div className="icon-container">
-              <div 
+              <div
                 className="icon-svg"
                 dangerouslySetInnerHTML={{ __html: updated.svg }}
                 style={{ color: updated.color }}
@@ -76,53 +124,178 @@ function IconDisplay({ filename, original, updated }: { filename: string, origin
 }
 
 function App() {
+  const [filter, setFilter] = useState<'all' | 'different'>('all')
+  const [darkMode, setDarkMode] = useState(false)
+  const [showUniqueOnly, setShowUniqueOnly] = useState(true)
+
+  // Select color theme based on dark mode
+  const colorTheme = useMemo(() => darkMode ? darkColorTheme : lightColorTheme, [darkMode])
+
+  // Create themed icon functions with current theme
+  const getThemedOriginal = useMemo(() => themeOriginalIcons(colorTheme), [colorTheme])
+  const getThemedUpdated = useMemo(() => themeUpdatedIcons(colorTheme), [colorTheme])
+
   const iconComparisons = useMemo(() => {
-    return sampleFiles.map(filename => {
-      let original, updated
-      
+    const allComparisons = allSampleFiles.map(filename => {
+      let original: ThemedIcon | null = null
+      let updated: ThemedIcon | null = null
+
       try {
         original = getThemedOriginal(filename)
-      } catch (e) {
-        original = null
+      } catch {
+        // Keep original as null
       }
-      
+
       try {
         updated = getThemedUpdated(filename)
-      } catch (e) {
-        updated = null
+      } catch {
+        // Keep updated as null
       }
-      
+
       return { filename, original, updated }
     })
-  }, [])
+
+    if (!showUniqueOnly) {
+      return allComparisons
+    }
+
+    // Filter for unique icons only
+    const seenIcons = new Map<string, { filename: string, original: ThemedIcon | null, updated: ThemedIcon | null }>()
+    
+    allComparisons.forEach(comparison => {
+      const { filename, original, updated } = comparison
+      // Create a unique key for this icon combination
+      const iconKey = `${original?.svg || 'null'}-${original?.color || 'null'}-${updated?.svg || 'null'}-${updated?.color || 'null'}`
+      
+      // Only keep the first filename for each unique icon combination
+      if (!seenIcons.has(iconKey)) {
+        seenIcons.set(iconKey, comparison)
+      }
+    })
+
+    return Array.from(seenIcons.values()).sort((a, b) => a.filename.localeCompare(b.filename))
+  }, [showUniqueOnly, getThemedOriginal, getThemedUpdated])
 
   const differentCount = iconComparisons.filter(({ original, updated }) => 
     original?.svg !== updated?.svg || original?.color !== updated?.color
   ).length
 
   const totalCount = iconComparisons.length
+  const sameCount = totalCount - differentCount
+
+  const filteredComparisons = useMemo(() => {
+    if (filter === 'different') {
+      return iconComparisons.filter(({ original, updated }) => 
+        original?.svg !== updated?.svg || original?.color !== updated?.color
+      )
+    }
+    return iconComparisons
+  }, [iconComparisons, filter])
 
   return (
-    <div className="app">
+    <div className={`app ${darkMode ? 'dark' : ''}`}>
       <header>
-        <h1>Seti Icons Comparison</h1>
+        <div className="header-top">
+          <h1>Seti Icons Comparison</h1>
+          <div className="theme-tabs">
+            <div className="tabs-list">
+              <button
+                className={`tabs-trigger ${!darkMode ? 'active' : ''}`}
+                onClick={() => setDarkMode(false)}
+                data-state={!darkMode ? 'active' : 'inactive'}
+              >
+                <span className="tab-icon">☀️</span>
+                <span className="tab-label">Light</span>
+              </button>
+              <button
+                className={`tabs-trigger ${darkMode ? 'active' : ''}`}
+                onClick={() => setDarkMode(true)}
+                data-state={darkMode ? 'active' : 'inactive'}
+              >
+                <span className="tab-icon">🌙</span>
+                <span className="tab-label">Dark</span>
+              </button>
+            </div>
+          </div>
+        </div>
         <p>Comparing original seti-icons package vs updated @peoplesgrocers/seti-icons</p>
-        <div className="stats">
-          <span className="stat">Total files: {totalCount}</span>
-          <span className="stat different">Different: {differentCount}</span>
-          <span className="stat same">Same: {totalCount - differentCount}</span>
+        
+        <div className="controls">
+          <div className="left-controls">
+            <div className="filter-controls">
+              <button 
+                className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
+                onClick={() => setFilter('all')}
+              >
+                All ({totalCount})
+              </button>
+              <button 
+                className={`filter-btn ${filter === 'different' ? 'active' : ''}`}
+                onClick={() => setFilter('different')}
+              >
+                Different ({differentCount})
+              </button>
+            </div>
+            <div className="unique-toggle">
+              <label className="toggle-label">
+                <input
+                  type="checkbox"
+                  checked={showUniqueOnly}
+                  onChange={(e) => setShowUniqueOnly(e.target.checked)}
+                  className="toggle-checkbox"
+                />
+                <span className="toggle-text">Show unique icons only</span>
+              </label>
+            </div>
+          </div>
+          <div className="stats">
+            <span className="stat same">Same: {sameCount}</span>
+          </div>
         </div>
       </header>
       
-      <div className="icons-grid">
-        {iconComparisons.map(({ filename, original, updated }) => (
-          <IconDisplay 
-            key={filename}
-            filename={filename}
-            original={original}
-            updated={updated}
-          />
-        ))}
+      <div className="icons-grid-compact">
+        <div className="grid-header">
+          <div className="filename-header">File</div>
+          <div className="original-header">Original</div>
+          <div className="updated-header">Updated</div>
+        </div>
+        {filteredComparisons.map(({ filename, original, updated }) => {
+          const isDifferent = original?.svg !== updated?.svg || original?.color !== updated?.color
+          return (
+            <div key={filename} className={`grid-row ${isDifferent ? 'different' : 'same'}`}>
+              <div className="filename-cell">{filename}</div>
+              <div className="icon-cell">
+                {original?.svg ? (
+                  <div className="icon-display">
+                    <div 
+                      className="icon-svg-compact"
+                      dangerouslySetInnerHTML={{ __html: original.svg }}
+                      style={{ color: original.color }}
+                    />
+                    <span className="color-compact">{original.color}</span>
+                  </div>
+                ) : (
+                  <div className="no-icon-compact">—</div>
+                )}
+              </div>
+              <div className="icon-cell">
+                {updated?.svg ? (
+                  <div className="icon-display">
+                    <div 
+                      className="icon-svg-compact"
+                      dangerouslySetInnerHTML={{ __html: updated.svg }}
+                      style={{ color: updated.color }}
+                    />
+                    <span className="color-compact">{updated.color}</span>
+                  </div>
+                ) : (
+                  <div className="no-icon-compact">—</div>
+                )}
+              </div>
+            </div>
+          )
+        })}
       </div>
     </div>
   )

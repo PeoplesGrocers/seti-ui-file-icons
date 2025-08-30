@@ -7,5 +7,5 @@ node_modules
 src/*.json
 # generated build scripts
 build/*.js
-# seti-ui repo
-/seti-ui
+# vendor directory
+/vendor

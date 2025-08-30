@@ -6,5 +6,5 @@ jestconfig.json
 .eslintignore
 .eslintrc
 .travis.yml
-seti-ui
+vendor
 build

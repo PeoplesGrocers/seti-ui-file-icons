@@ -1,11 +1,10 @@
 import { readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
-import SVGO from "svgo";
+import { optimize } from "svgo";
 import svgoPlugins from "./svgoPlugins.js";
-const svgo = new SVGO(svgoPlugins);
 
-const SOURCE_PATH = "../seti-ui/styles/components/icons/mapping.less";
-const BASE_PATH = "../seti-ui/icons";
+const SOURCE_PATH = "../vendor/seti-ui/styles/components/icons/mapping.less";
+const BASE_PATH = "../vendor/seti-ui/icons";
 
 const source = readFileSync(resolve(__dirname, SOURCE_PATH), "utf-8");
 
@@ -51,7 +50,7 @@ writeFileSync(
 
 // optimize svgs
 const trim = async (svg: string): Promise<string> => {
-  return (await svgo.optimize(svg)).data;
+  return optimize(svg, svgoPlugins).data;
 };
 
 // icons used for file types

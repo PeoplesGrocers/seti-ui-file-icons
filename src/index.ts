@@ -1,5 +1,5 @@
-import rawDefinitions = require("./definitions.json");
-import rawIcons = require("./icons.json");
+import rawDefinitions from "./definitions.json";
+import rawIcons from "./icons.json";
 
 type IconDetails = [string, string];
 
@@ -78,4 +78,4 @@ const themeIcons = (theme: SetiTheme) => {
   };
 };
 
-export { getIcon, themeIcons };
+export { getIcon, themeIcons, definitions };
