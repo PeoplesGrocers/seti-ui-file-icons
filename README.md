@@ -1,6 +1,5 @@
-[![Travis (.com)](https://img.shields.io/travis/com/elviswolcott/seti-icons?logo=travis)](https://travis-ci.com/elviswolcott/seti-icons)
-[![npm](https://img.shields.io/npm/v/seti-icons?label=seti-icons&logo=npm)](https://www.npmjs.com/package/seti-icons)
-# seti-icons
+[![npm](https://img.shields.io/npm/v/@peoplesgrocers/seti-ui-file-icons?label=@peoplesgrocers/seti-ui-file-icons&logo=npm)](https://www.npmjs.com/package/@peoplesgrocers/seti-ui-file-icons)
+# seti-ui-file-icons
 
 > File icons from Seti-UI
 
@@ -20,7 +19,7 @@ For example, in a webapp where the icons are used dynamically, it would likely b
 By default, the color name from Seti-UI is returned for icons.
 
 ```js
-import { getIcon } from "seti-icons";
+import { getIcon } from "@peoplesgrocers/seti-ui-file-icons";
 
 const { svg, color } = getIcon("README.md");
 ```
@@ -28,7 +27,7 @@ const { svg, color } = getIcon("README.md");
 To replace the color keywords, use `themeIcons`.
 
 ```js
-import { themeIcons } from "seti-icons";
+import { themeIcons } from "@peoplesgrocers/seti-ui-file-icons";
 
 const getIcon = themeIcons({
   blue: "#268bd2",
@@ -61,17 +60,13 @@ Runs a complete build from a fresh install
 
 Builds the package using typescript into `./lib`
 
-### `npm run build:scripts`
-
-Builds the build scripts
-
 ### `npm run extract`
 
 Processes the icons and styles in `seti-ui` into JSON files
 
 ### `npm test`
 
-Launches the Jest to run tests.
+Uses UVU to run tests.
 
 ### `npm run lint`
 
@@ -83,4 +78,4 @@ Checks code for style issues and syntax errors with TSLint and Prettier, attempt
 
 ## Publishing a new version
 
-Travis is configured to run deploys on tags.
+Manually
